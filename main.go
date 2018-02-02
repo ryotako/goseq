@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"github.com/dustin/go-humanize"
 	"os"
 	"strconv"
 )
@@ -16,17 +17,22 @@ func abend(s string) {
 	os.Exit(1)
 }
 
+func printNum(n float64) {
+	fmt.Fprintln(os.Stdout, humanize.Ftoa(n))
+}
+
 func main() {
-	fst, inc, lst := 1, 1, 1
+	fst, inc, lst := 1.0, 1.0, 1.0
 
 	a := os.Args[1:]
 
 	i, cnt := 0, 0
 	for i < len(a) {
-		n, err := strconv.Atoi(a[i])
+		// n, err := strconv.Atoi(a[i])
+		n, err := strconv.ParseFloat(a[i], 64)
 
 		if err != nil {
-			abend("invalid integer argument " + a[i])
+			abend("invalid floating point argument " + a[i])
 		}
 
 		switch cnt {
@@ -56,20 +62,20 @@ func main() {
 		} else if inc < 0 {
 			abend("needs positive increment")
 		} else {
-			for i := fst; i < lst+1; i += inc {
-				fmt.Println(i)
+			for i := fst; i < lst+inc; i += inc {
+				printNum(i)
 			}
 		}
 	} else {
 		if inc == 0 {
 			abend("zero increment")
 		} else if fst == lst {
-			fmt.Println(fst)
+			printNum(fst)
 		} else if inc > 0 {
 			abend("needs negative increment")
 		} else {
-			for i := fst; i > lst-1; i += inc {
-				fmt.Println(i)
+			for i := fst; i > lst+inc; i += inc {
+				printNum(i)
 			}
 		}
 	}
