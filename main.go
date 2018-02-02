@@ -17,12 +17,12 @@ func main() {
 	os.Exit(cli.Run(os.Args[1:]))
 }
 
-func usage(o io.Writer) {
-	fmt.Fprintln(o, "usage: seq [first [incr]] last")
+func usage(w io.Writer) {
+	fmt.Fprintln(w, "usage: seq [first [incr]] last")
 }
 
-func printNum(n float64) {
-	fmt.Fprintln(os.Stdout, humanize.Ftoa(n))
+func printNum(w io.Writer, n float64) {
+	fmt.Fprintln(w, humanize.Ftoa(n))
 }
 
 func (c *CLI) Run(a []string) int {
@@ -49,7 +49,7 @@ func (c *CLI) Run(a []string) int {
 			inc, lst = lst, n
 			cnt++
 		default:
-			usage(c.outStream)
+			usage(c.errStream)
 			return 1
 		}
 
@@ -57,7 +57,7 @@ func (c *CLI) Run(a []string) int {
 	}
 
 	if cnt == 0 {
-		usage(c.outStream)
+		usage(c.errStream)
 		return 1
 	}
 
@@ -69,8 +69,8 @@ func (c *CLI) Run(a []string) int {
 			fmt.Fprintln(c.errStream, "needs positive increment")
 			return 1
 		} else {
-			for i := fst; i < lst+inc; i += inc {
-				printNum(i)
+			for i := fst; i <= lst; i += inc {
+				printNum(c.outStream, i)
 			}
 		}
 	} else {
@@ -78,13 +78,13 @@ func (c *CLI) Run(a []string) int {
 			fmt.Fprintln(c.errStream, "zero increment")
 			return 1
 		} else if fst == lst {
-			printNum(fst)
+			printNum(c.outStream, fst)
 		} else if inc > 0 {
 			fmt.Fprintln(c.errStream, "needs negative increment")
 			return 1
 		} else {
-			for i := fst; i > lst+inc; i += inc {
-				printNum(i)
+			for i := fst; i >= lst; i += inc {
+				printNum(c.outStream, i)
 			}
 		}
 	}
