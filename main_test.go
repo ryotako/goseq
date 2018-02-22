@@ -14,10 +14,25 @@ func TestRun(t *testing.T) {
 		input, want string
 		err         bool
 	}{
-		{input: "", want: "", err: true},
-		{input: "5", want: "1\n2\n3\n4\n5\n", err: false},
-		{input: "2 5", want: "2\n3\n4\n5\n", err: false},
-		{input: "2 2 5", want: "2\n4\n", err: false},
+		// positive integers
+		{input: "5", want: "1,2,3,4,5"},
+		{input: "2 5", want: "2,3,4,5"},
+		{input: "2 2 5", want: "2,4"},
+		{input: "0", want: "1,0"},
+		// negative integers
+		{input: "-1", want: "1,0,-1"},
+		{input: "1 -2", want: "1,0,-1,-2"},
+		{input: "-1 -1 -3", want: "-1,-2,-3"},
+		// floating point numbers
+		{input: "0.1", want: "1"},
+		{input: "-0.1 1", want: "-0.1,0.9"},
+		{input: "0 0.1 1", want: "0,0.1,0.2,0.3,0.4,0.5,0.6,0.7,0.8,0.9,1"},
+		// invalid inputs
+		{input: "", err: true},
+		{input: "a", err: true},
+		{input: ".", err: true},
+		{input: "-", err: true},
+		{input: "+", err: true},
 	}
 
 	for _, test := range tests {
@@ -42,8 +57,9 @@ func TestRun(t *testing.T) {
 				t.Errorf("%q >> status code %d should be zero", test.input, status)
 			}
 			got := outStream.String()
-			if test.want != got {
-				t.Errorf("%q >> want %q, but %q", test.input, test.want, got)
+			want := strings.Replace(test.want, ",", "\n", -1) + "\n"
+			if want != got {
+				t.Errorf("%q >> want %q, but %q", test.input, want, got)
 			}
 
 		}
