@@ -16,6 +16,9 @@ type CLI struct {
 	outStream, errStream io.Writer
 }
 
+// structure to calc floating point number correctly
+// 1.23 => Number{number:123, order:2}
+// 0.001 => Number{number:1, order:3}
 type Number struct {
 	number, order int
 }
