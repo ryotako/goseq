@@ -35,7 +35,10 @@ func ParseNumber(s string) (*Number, error) {
 		isNegative = true
 		s = s[1:]
 	}
-	s = strings.Trim(s, "0")
+	s = strings.TrimLeft(s, "0")
+	if strings.Contains(s, ".") {
+		s = strings.TrimRight(s, "0")
+	}
 	i := strings.Index(s, ".")
 
 	var order int
@@ -69,7 +72,7 @@ func (n *Number) String() string {
 	l := len(s)
 	switch {
 	case n.order < 0:
-		return ""
+		return sign + s + strings.Repeat("0", -n.order)
 	case n.order == 0:
 		return sign + s
 	case n.order >= l:

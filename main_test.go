@@ -19,6 +19,8 @@ func TestRun(t *testing.T) {
 		{input: "2 5", want: "2,3,4,5"},
 		{input: "2 2 5", want: "2,4"},
 		{input: "0", want: "1,0"},
+		{input: "10", want: "1,2,3,4,5,6,7,8,9,10"},
+		{input: "10 10 50", want: "10,20,30,40,50"},
 		// negative integers
 		{input: "-1", want: "1,0,-1"},
 		{input: "1 -2", want: "1,0,-1,-2"},
