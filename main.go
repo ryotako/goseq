@@ -30,6 +30,7 @@ func usage(w io.Writer) {
 
 func (c *CLI) Run(args []string) int {
 	flagS := "\n"
+	flagT := ""
 	numArgs := []string{}
 
 loop:
@@ -43,6 +44,16 @@ loop:
 				errorf(c.errStream, "option requires an argument -- s")
 				return INVALID_SYNTAX
 			}
+
+		case "-t":
+			if i+1 < len(args) {
+				flagT = args[i+1]
+				i++
+			} else {
+				errorf(c.errStream, "option requires an argument -- s")
+				return INVALID_SYNTAX
+			}
+
 		default:
 			if r := regexp.MustCompile(`^-[^\d\.]`); r.MatchString(args[i]) {
 				errorf(c.errStream, "illegal option -- %s", strings.TrimLeft(args[i], "-"))
@@ -113,6 +124,7 @@ loop:
 			}
 		}
 	}
+	fmt.Fprint(c.outStream, flagT)
 	return SUCCESS
 }
 

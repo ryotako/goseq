@@ -38,6 +38,9 @@ func TestRun(t *testing.T) {
 		// -s option
 		{input: "-s @ 3", want: "1@2@3@"},
 		{input: "-s <> 3", want: "1<>2<>3<>"},
+		// -t option
+		{input: "-t @ 3", want: "1,2,3,@"},
+		{input: "-t done 3", want: "1,2,3,done"},
 	}
 
 	for _, test := range tests {
