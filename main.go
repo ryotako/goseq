@@ -1,8 +1,5 @@
 package main
 
-// TODO: 浮動小数の誤差の処理
-// 現状では goseq 1 0.1 2 が 1, 1.1 ... 1.9 で止まる
-
 import (
 	"fmt"
 	"github.com/shopspring/decimal"
