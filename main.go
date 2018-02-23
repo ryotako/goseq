@@ -25,7 +25,7 @@ func main() {
 }
 
 func usage(w io.Writer) {
-	fmt.Fprintln(w, "usage: seq [first [incr]] last")
+	fmt.Fprintln(w, "usage: goseq [first [incr]] last")
 }
 
 func (c *CLI) Run(args []string) int {
