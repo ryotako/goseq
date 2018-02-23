@@ -13,6 +13,7 @@ func TestParse(t *testing.T) {
 		{input: "10000", want: "10000"},
 		{input: "0.1", want: "0.1"},
 		{input: "0.0001", want: "0.0001"},
+		{input: "-0.1", want: "-0.1"},
 	}
 
 	for _, test := range tests {
@@ -67,9 +68,12 @@ func TestCalc(t *testing.T) {
 		{msg: "3+7", got: D("3").Add(D("7")), want: "10"},
 		{msg: "10+2", got: D("10").Add(D("2")), want: "12"},
 		{msg: "1+0.2", got: D("1").Add(D("0.2")), want: "1.2"},
+		{msg: "1+0.1", got: D("1").Add(D("0.1")), want: "1.1"},
+		{msg: "0+0.1", got: D("0").Add(D("0.1")), want: "0.1"},
 		{msg: "1-1", got: D("1").Sub(D("1")), want: "0"},
 		{msg: "10-1", got: D("10").Sub(D("1")), want: "9"},
 		{msg: "1-0.1", got: D("1").Sub(D("0.1")), want: "0.9"},
+		{msg: "-0.1+1", got: D("-0.1").Add(D("1")), want: "0.9"},
 	}
 
 	for _, test := range tests {

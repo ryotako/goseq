@@ -22,8 +22,8 @@ func Parse(s string) (*Decimal, error) {
 		s = s[1:]
 	}
 
-	if len(strings.Trim(s, "0")) == 0 {
-		return &Decimal{frac: 0, exponent: 1}, nil
+	if len(s) > 0 && len(strings.Trim(s, "0")) == 0 {
+		return &Decimal{frac: 0, exponent: 0}, nil
 	}
 
 	s = strings.TrimLeft(s, "0")
@@ -56,6 +56,10 @@ func Parse(s string) (*Decimal, error) {
 }
 
 func (d *Decimal) String() string {
+	if d.frac == 0 {
+		return "0"
+	}
+
 	var s, sign string
 	if d.frac < 0 {
 		s = strconv.Itoa(-d.frac)
@@ -153,6 +157,8 @@ func (d1 *Decimal) Add(d2 *Decimal) *Decimal {
 
 	if digit(frac) > digit(a) && digit(frac) > digit(b) {
 		exponent++
+	} else if digit(frac) < digit(a) {
+		exponent--
 	}
 
 	return &Decimal{frac: dropZeroes(frac), exponent: exponent}
@@ -172,11 +178,17 @@ func (d1 *Decimal) Sub(d2 *Decimal) *Decimal {
 		exponent = d2.exponent
 	}
 
-	if digit(frac) < digit(a) {
+	if digit(frac) > digit(a) && digit(frac) > digit(b) {
+		exponent++
+	} else if digit(frac) < digit(a) {
 		exponent--
 	}
 
 	return &Decimal{frac: dropZeroes(frac), exponent: exponent}
+}
+
+func (d *Decimal) Copy() *Decimal {
+	return &Decimal{frac: d.frac, exponent: d.exponent}
 }
 
 // e.g. 1200 -> 12
