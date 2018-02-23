@@ -29,6 +29,7 @@ func usage(w io.Writer) {
 }
 
 func (c *CLI) Run(args []string) int {
+	flagF := "%g"
 	flagS := "\n"
 	flagT := ""
 	numArgs := []string{}
@@ -36,6 +37,15 @@ func (c *CLI) Run(args []string) int {
 loop:
 	for i := 0; i < len(args); i++ {
 		switch args[i] {
+		case "-f":
+			if i+1 < len(args) {
+				flagF = args[i+1]
+				i++
+			} else {
+				errorf(c.errStream, "option requires an argument -- s")
+				return INVALID_SYNTAX
+			}
+
 		case "-s":
 			if i+1 < len(args) {
 				flagS = args[i+1]
@@ -97,6 +107,11 @@ loop:
 		inc, _ = decimal.NewFromString("-1")
 	}
 
+	if !isValidFormat(flagF) {
+		errorf(c.errStream, "invalid format string: `%s'", flagF)
+		return INVALID_SYNTAX
+	}
+
 	if fst.LessThan(lst) {
 		switch inc.Sign() {
 		case 0:
@@ -135,4 +150,25 @@ loop:
 
 func errorf(w io.Writer, format string, a ...interface{}) {
 	fmt.Fprintf(w, fmt.Sprintf("goseq: %s", format), a...)
+}
+
+// valid format
+// 1. contains one of %e, %E, %f, %g, %G once, or contains none of them
+// 2. does not contains %X, X is any charactor except for e, E, f, g, G
+func isValidFormat(s string) bool {
+	r := regexp.MustCompile(`%%|%[-\+ #]*\d*\.?\d*.`)
+	i := 0
+	for _, format := range r.FindAllString(s, -1) {
+		if format == "%%" {
+			continue
+		} else if strings.ContainsAny(format, "eEfgG") {
+			i++
+			if i > 1 {
+				return false
+			}
+		} else {
+			return false
+		}
+	}
+	return true
 }
