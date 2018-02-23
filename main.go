@@ -29,42 +29,23 @@ func usage(w io.Writer) {
 }
 
 func (c *CLI) Run(args []string) int {
-	flagF := "%g"
-	flagS := "\n"
-	flagT := ""
+	flags := map[string]string{
+		"-f": "%g",
+		"-s": "\n",
+		"-t": "",
+	}
 	numArgs := []string{}
 
 loop:
 	for i := 0; i < len(args); i++ {
-		switch args[i] {
-		case "-f":
+		if _, ok := flags[args[i]]; ok {
 			if i+1 < len(args) {
-				flagF = args[i+1]
+				flags[args[i]] = args[i+1]
 				i++
 			} else {
 				errorf(c.errStream, "option requires an argument -- s")
-				return INVALID_SYNTAX
 			}
-
-		case "-s":
-			if i+1 < len(args) {
-				flagS = args[i+1]
-				i++
-			} else {
-				errorf(c.errStream, "option requires an argument -- s")
-				return INVALID_SYNTAX
-			}
-
-		case "-t":
-			if i+1 < len(args) {
-				flagT = args[i+1]
-				i++
-			} else {
-				errorf(c.errStream, "option requires an argument -- s")
-				return INVALID_SYNTAX
-			}
-
-		default:
+		} else {
 			if r := regexp.MustCompile(`^-[^\d\.]`); r.MatchString(args[i]) {
 				errorf(c.errStream, "illegal option -- %s", strings.TrimLeft(args[i], "-"))
 				return INVALID_SYNTAX
@@ -107,8 +88,8 @@ loop:
 		inc, _ = decimal.NewFromString("-1")
 	}
 
-	if !isValidFormat(flagF) {
-		errorf(c.errStream, "invalid format string: `%s'", flagF)
+	if !isValidFormat(flags["-f"]) {
+		errorf(c.errStream, "invalid format string: `%s'", flags["-f"])
 		return INVALID_SYNTAX
 	}
 
@@ -123,7 +104,7 @@ loop:
 		default:
 			for i := fst; i.LessThanOrEqual(lst); i = i.Add(inc) {
 				f, _ := i.Float64()
-				fmt.Fprintf(c.outStream, "%s%s", fmt.Sprintf(flagF, f), flagS)
+				fmt.Fprintf(c.outStream, "%s%s", fmt.Sprintf(flags["-f"], f), flags["-s"])
 			}
 		}
 	} else if fst.GreaterThan(lst) {
@@ -137,14 +118,14 @@ loop:
 		default:
 			for i := fst; i.GreaterThanOrEqual(lst); i = i.Add(inc) {
 				f, _ := i.Float64()
-				fmt.Fprintf(c.outStream, "%s%s", fmt.Sprintf(flagF, f), flagS)
+				fmt.Fprintf(c.outStream, "%s%s", fmt.Sprintf(flags["-f"], f), flags["-s"])
 			}
 		}
 	} else {
 		f, _ := fst.Float64()
-		fmt.Fprintf(c.outStream, "%s%s", fmt.Sprintf(flagF, f), flagS)
+		fmt.Fprintf(c.outStream, "%s%s", fmt.Sprintf(flags["-f"], f), flags["-s"])
 	}
-	fmt.Fprint(c.outStream, flagT)
+	fmt.Fprint(c.outStream, flags["-t"])
 	return SUCCESS
 }
 
