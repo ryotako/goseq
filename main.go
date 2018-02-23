@@ -107,10 +107,11 @@ loop:
 			return INCREMENT_ERROR
 		default:
 			for i := fst; i.LessThanOrEqual(lst); i = i.Add(inc) {
-				fmt.Fprintf(c.outStream, "%s%s", i, flagS)
+				f, _ := i.Float64()
+				fmt.Fprintf(c.outStream, "%s%s", fmt.Sprintf(flagF, f), flagS)
 			}
 		}
-	} else {
+	} else if fst.GreaterThan(lst) {
 		switch inc.Sign() {
 		case 0:
 			errorf(c.errStream, "zero increment")
@@ -120,9 +121,13 @@ loop:
 			return INCREMENT_ERROR
 		default:
 			for i := fst; i.GreaterThanOrEqual(lst); i = i.Add(inc) {
-				fmt.Fprintf(c.outStream, "%s%s", i, flagS)
+				f, _ := i.Float64()
+				fmt.Fprintf(c.outStream, "%s%s", fmt.Sprintf(flagF, f), flagS)
 			}
 		}
+	} else {
+		f, _ := fst.Float64()
+		fmt.Fprintf(c.outStream, "%s%s", fmt.Sprintf(flagF, f), flagS)
 	}
 	fmt.Fprint(c.outStream, flagT)
 	return SUCCESS
