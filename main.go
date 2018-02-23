@@ -5,7 +5,7 @@ package main
 
 import (
 	"fmt"
-	"github.com/ryotako/goseq/decimal"
+	"github.com/shopspring/decimal"
 	"io"
 	"os"
 )
@@ -25,22 +25,22 @@ func usage(w io.Writer) {
 
 func (c *CLI) Run(args []string) int {
 
-	var fst, inc, lst *decimal.Decimal
+	var fst, inc, lst decimal.Decimal
 	var err0, err1, err2 error
 
 	switch len(args) {
 	case 1:
-		fst, _ = decimal.Parse("1")
-		inc, _ = decimal.Parse("1")
-		lst, err0 = decimal.Parse(args[0])
+		fst, _ = decimal.NewFromString("1")
+		inc, _ = decimal.NewFromString("1")
+		lst, err0 = decimal.NewFromString(args[0])
 	case 2:
-		fst, err0 = decimal.Parse(args[0])
-		inc, _ = decimal.Parse("1")
-		lst, err1 = decimal.Parse(args[1])
+		fst, err0 = decimal.NewFromString(args[0])
+		inc, _ = decimal.NewFromString("1")
+		lst, err1 = decimal.NewFromString(args[1])
 	case 3:
-		fst, err0 = decimal.Parse(args[0])
-		inc, err1 = decimal.Parse(args[1])
-		lst, err2 = decimal.Parse(args[2])
+		fst, err0 = decimal.NewFromString(args[0])
+		inc, err1 = decimal.NewFromString(args[1])
+		lst, err2 = decimal.NewFromString(args[2])
 	default:
 		usage(c.errStream)
 		return 1
@@ -60,32 +60,32 @@ func (c *CLI) Run(args []string) int {
 	}
 
 	if len(args) < 3 && fst.GreaterThan(lst) {
-		inc, _ = decimal.Parse("-1")
+		inc, _ = decimal.NewFromString("-1")
 	}
 
 	if fst.LessThan(lst) {
-		if inc.IsZero() {
+		switch inc.Sign() {
+		case 0:
 			fmt.Fprintln(c.errStream, "zero increment")
 			return 1
-		} else if inc.IsNegative() {
+		case -1:
 			fmt.Fprintln(c.errStream, "needs positive increment")
 			return 1
-		} else {
-			for i := fst.Copy(); i.LessOrEqual(lst); i = i.Add(inc) {
+		default:
+			for i := fst; i.LessThanOrEqual(lst); i = i.Add(inc) {
 				fmt.Fprintln(c.outStream, i)
 			}
 		}
 	} else {
-		if inc.IsZero() {
+		switch inc.Sign() {
+		case 0:
 			fmt.Fprintln(c.errStream, "zero increment")
 			return 1
-		} else if fst.Equal(lst) {
-			fmt.Fprintln(c.outStream, fst)
-		} else if inc.IsPositive() {
+		case 1:
 			fmt.Fprintln(c.errStream, "needs negative increment")
 			return 1
-		} else {
-			for i := fst.Copy(); i.GreaterOrEqual(lst); i = i.Add(inc) {
+		default:
+			for i := fst; i.GreaterThanOrEqual(lst); i = i.Add(inc) {
 				fmt.Fprintln(c.outStream, i)
 			}
 		}
