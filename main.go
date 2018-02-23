@@ -26,37 +26,31 @@ func usage(w io.Writer) {
 func (c *CLI) Run(args []string) int {
 
 	var fst, inc, lst decimal.Decimal
-	var err0, err1, err2 error
+	errs := make([]error, 3)
 
 	switch len(args) {
 	case 1:
 		fst, _ = decimal.NewFromString("1")
 		inc, _ = decimal.NewFromString("1")
-		lst, err0 = decimal.NewFromString(args[0])
+		lst, errs[0] = decimal.NewFromString(args[0])
 	case 2:
-		fst, err0 = decimal.NewFromString(args[0])
+		fst, errs[0] = decimal.NewFromString(args[0])
 		inc, _ = decimal.NewFromString("1")
-		lst, err1 = decimal.NewFromString(args[1])
+		lst, errs[1] = decimal.NewFromString(args[1])
 	case 3:
-		fst, err0 = decimal.NewFromString(args[0])
-		inc, err1 = decimal.NewFromString(args[1])
-		lst, err2 = decimal.NewFromString(args[2])
+		fst, errs[0] = decimal.NewFromString(args[0])
+		inc, errs[1] = decimal.NewFromString(args[1])
+		lst, errs[2] = decimal.NewFromString(args[2])
 	default:
 		usage(c.errStream)
 		return 1
 	}
 
-	if err0 != nil {
-		fmt.Fprintf(c.errStream, "invalid floating point argument: %s\n", args[0])
-		return 1
-	}
-	if err1 != nil {
-		fmt.Fprintf(c.errStream, "invalid floating point argument: %s\n", args[1])
-		return 1
-	}
-	if err2 != nil {
-		fmt.Fprintf(c.errStream, "invalid floating point argument: %s\n", args[2])
-		return 1
+	for i, err := range errs {
+		if err != nil {
+			fmt.Fprintf(c.errStream, "invalid floating point argument: %s\n", args[i])
+			return 1
+		}
 	}
 
 	if len(args) < 3 && fst.GreaterThan(lst) {
