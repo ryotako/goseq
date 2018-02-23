@@ -48,7 +48,7 @@ func (c *CLI) Run(args []string) int {
 
 	for i, err := range errs {
 		if err != nil {
-			fmt.Fprintf(c.errStream, "invalid floating point argument: %s\n", args[i])
+			errorf(c.errStream, "invalid floating point argument: %s\n", args[i])
 			return 1
 		}
 	}
@@ -60,10 +60,10 @@ func (c *CLI) Run(args []string) int {
 	if fst.LessThan(lst) {
 		switch inc.Sign() {
 		case 0:
-			fmt.Fprintln(c.errStream, "zero increment")
+			errorf(c.errStream, "zero increment")
 			return 1
 		case -1:
-			fmt.Fprintln(c.errStream, "needs positive increment")
+			errorf(c.errStream, "needs positive increment")
 			return 1
 		default:
 			for i := fst; i.LessThanOrEqual(lst); i = i.Add(inc) {
@@ -73,10 +73,10 @@ func (c *CLI) Run(args []string) int {
 	} else {
 		switch inc.Sign() {
 		case 0:
-			fmt.Fprintln(c.errStream, "zero increment")
+			errorf(c.errStream, "zero increment")
 			return 1
 		case 1:
-			fmt.Fprintln(c.errStream, "needs negative increment")
+			errorf(c.errStream, "needs negative increment")
 			return 1
 		default:
 			for i := fst; i.GreaterThanOrEqual(lst); i = i.Add(inc) {
@@ -85,4 +85,8 @@ func (c *CLI) Run(args []string) int {
 		}
 	}
 	return 0
+}
+
+func errorf(w io.Writer, format string, a ...interface{}) {
+	fmt.Fprintf(w, fmt.Sprintf("goseq: %s", format), a...)
 }
