@@ -15,26 +15,29 @@ func TestRun(t *testing.T) {
 		err         bool
 	}{
 		// positive integers
-		{input: "5", want: "1,2,3,4,5"},
-		{input: "2 5", want: "2,3,4,5"},
-		{input: "2 2 5", want: "2,4"},
-		{input: "0", want: "1,0"},
-		{input: "10", want: "1,2,3,4,5,6,7,8,9,10"},
-		{input: "10 10 50", want: "10,20,30,40,50"},
+		{input: "5", want: "1,2,3,4,5,"},
+		{input: "2 5", want: "2,3,4,5,"},
+		{input: "2 2 5", want: "2,4,"},
+		{input: "0", want: "1,0,"},
+		{input: "10", want: "1,2,3,4,5,6,7,8,9,10,"},
+		{input: "10 10 50", want: "10,20,30,40,50,"},
 		// negative integers
-		{input: "-1", want: "1,0,-1"},
-		{input: "1 -2", want: "1,0,-1,-2"},
-		{input: "-1 -1 -3", want: "-1,-2,-3"},
+		{input: "-1", want: "1,0,-1,"},
+		{input: "1 -2", want: "1,0,-1,-2,"},
+		{input: "-1 -1 -3", want: "-1,-2,-3,"},
 		// floating point numbers
-		{input: "0.1", want: "1"},
-		{input: "-0.1 1", want: "-0.1,0.9"},
-		{input: "0 0.1 1", want: "0,0.1,0.2,0.3,0.4,0.5,0.6,0.7,0.8,0.9,1"},
+		{input: "0.1", want: "1,"},
+		{input: "-0.1 1", want: "-0.1,0.9,"},
+		{input: "0 0.1 1", want: "0,0.1,0.2,0.3,0.4,0.5,0.6,0.7,0.8,0.9,1,"},
 		// invalid inputs
 		{input: "", err: true},
 		{input: "a", err: true},
 		{input: ".", err: true},
 		{input: "-", err: true},
 		{input: "+", err: true},
+		// -s option
+		{input: "-s @ 3", want: "1@2@3@"},
+		{input: "-s <> 3", want: "1<>2<>3<>"},
 	}
 
 	for _, test := range tests {
@@ -59,7 +62,7 @@ func TestRun(t *testing.T) {
 				t.Errorf("%q >> status code %d should be zero", test.input, status)
 			}
 			got := outStream.String()
-			want := strings.Replace(test.want, ",", "\n", -1) + "\n"
+			want := strings.Replace(test.want, ",", "\n", -1)
 			if want != got {
 				t.Errorf("%q >> want %q, but %q", test.input, want, got)
 			}

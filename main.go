@@ -5,6 +5,8 @@ import (
 	"github.com/shopspring/decimal"
 	"io"
 	"os"
+	"regexp"
+	"strings"
 )
 
 const (
@@ -27,23 +29,47 @@ func usage(w io.Writer) {
 }
 
 func (c *CLI) Run(args []string) int {
+	flagS := "\n"
+	numArgs := []string{}
+
+loop:
+	for i := 0; i < len(args); i++ {
+		switch args[i] {
+		case "-s":
+			if i+1 < len(args) {
+				flagS = args[i+1]
+				i++
+			} else {
+				errorf(c.errStream, "option requires an argument -- s")
+				return INVALID_SYNTAX
+			}
+		default:
+			if r := regexp.MustCompile(`^-[^\d\.]`); r.MatchString(args[i]) {
+				errorf(c.errStream, "illegal option -- %s", strings.TrimLeft(args[i], "-"))
+				return INVALID_SYNTAX
+			} else {
+				numArgs = append(numArgs, args[i:]...)
+				break loop
+			}
+		}
+	}
 
 	var fst, inc, lst decimal.Decimal
 	errs := make([]error, 3)
 
-	switch len(args) {
+	switch len(numArgs) {
 	case 1:
 		fst, _ = decimal.NewFromString("1")
 		inc, _ = decimal.NewFromString("1")
-		lst, errs[0] = decimal.NewFromString(args[0])
+		lst, errs[0] = decimal.NewFromString(numArgs[0])
 	case 2:
-		fst, errs[0] = decimal.NewFromString(args[0])
+		fst, errs[0] = decimal.NewFromString(numArgs[0])
 		inc, _ = decimal.NewFromString("1")
-		lst, errs[1] = decimal.NewFromString(args[1])
+		lst, errs[1] = decimal.NewFromString(numArgs[1])
 	case 3:
-		fst, errs[0] = decimal.NewFromString(args[0])
-		inc, errs[1] = decimal.NewFromString(args[1])
-		lst, errs[2] = decimal.NewFromString(args[2])
+		fst, errs[0] = decimal.NewFromString(numArgs[0])
+		inc, errs[1] = decimal.NewFromString(numArgs[1])
+		lst, errs[2] = decimal.NewFromString(numArgs[2])
 	default:
 		usage(c.errStream)
 		return INVALID_SYNTAX
@@ -51,12 +77,12 @@ func (c *CLI) Run(args []string) int {
 
 	for i, err := range errs {
 		if err != nil {
-			errorf(c.errStream, "invalid floating point argument: %s\n", args[i])
+			errorf(c.errStream, "invalid floating point argument: %s\n", numArgs[i])
 			return INVALID_SYNTAX
 		}
 	}
 
-	if len(args) < 3 && fst.GreaterThan(lst) {
+	if len(numArgs) < 3 && fst.GreaterThan(lst) {
 		inc, _ = decimal.NewFromString("-1")
 	}
 
@@ -70,7 +96,7 @@ func (c *CLI) Run(args []string) int {
 			return INCREMENT_ERROR
 		default:
 			for i := fst; i.LessThanOrEqual(lst); i = i.Add(inc) {
-				fmt.Fprintln(c.outStream, i)
+				fmt.Fprintf(c.outStream, "%s%s", i, flagS)
 			}
 		}
 	} else {
@@ -83,7 +109,7 @@ func (c *CLI) Run(args []string) int {
 			return INCREMENT_ERROR
 		default:
 			for i := fst; i.GreaterThanOrEqual(lst); i = i.Add(inc) {
-				fmt.Fprintln(c.outStream, i)
+				fmt.Fprintf(c.outStream, "%s%s", i, flagS)
 			}
 		}
 	}
