@@ -10,6 +10,12 @@ import (
 	"os"
 )
 
+const (
+	SUCCESS = iota
+	INVALID_SYNTAX
+	INCREMENT_ERROR
+)
+
 type CLI struct {
 	outStream, errStream io.Writer
 }
@@ -43,13 +49,13 @@ func (c *CLI) Run(args []string) int {
 		lst, errs[2] = decimal.NewFromString(args[2])
 	default:
 		usage(c.errStream)
-		return 1
+		return INVALID_SYNTAX
 	}
 
 	for i, err := range errs {
 		if err != nil {
 			errorf(c.errStream, "invalid floating point argument: %s\n", args[i])
-			return 1
+			return INVALID_SYNTAX
 		}
 	}
 
@@ -61,10 +67,10 @@ func (c *CLI) Run(args []string) int {
 		switch inc.Sign() {
 		case 0:
 			errorf(c.errStream, "zero increment")
-			return 1
+			return INCREMENT_ERROR
 		case -1:
 			errorf(c.errStream, "needs positive increment")
-			return 1
+			return INCREMENT_ERROR
 		default:
 			for i := fst; i.LessThanOrEqual(lst); i = i.Add(inc) {
 				fmt.Fprintln(c.outStream, i)
@@ -74,17 +80,17 @@ func (c *CLI) Run(args []string) int {
 		switch inc.Sign() {
 		case 0:
 			errorf(c.errStream, "zero increment")
-			return 1
+			return INCREMENT_ERROR
 		case 1:
 			errorf(c.errStream, "needs negative increment")
-			return 1
+			return INCREMENT_ERROR
 		default:
 			for i := fst; i.GreaterThanOrEqual(lst); i = i.Add(inc) {
 				fmt.Fprintln(c.outStream, i)
 			}
 		}
 	}
-	return 0
+	return SUCCESS
 }
 
 func errorf(w io.Writer, format string, a ...interface{}) {
