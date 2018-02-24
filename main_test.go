@@ -18,15 +18,16 @@ func TestRun(t *testing.T) {
 		{input: "5", want: "1,2,3,4,5,"},
 		{input: "2 5", want: "2,3,4,5,"},
 		{input: "2 2 5", want: "2,4,"},
-		{input: "0", want: "1,0,"},
+		{input: "0", want: ""},
 		{input: "10", want: "1,2,3,4,5,6,7,8,9,10,"},
 		{input: "10 10 50", want: "10,20,30,40,50,"},
 		// negative integers
-		{input: "-1", want: "1,0,-1,"},
-		{input: "1 -2", want: "1,0,-1,-2,"},
+		{input: "-1", want: ""},
+		{input: "1 -2", want: ""},
 		{input: "-1 -1 -3", want: "-1,-2,-3,"},
 		// floating point numbers
-		{input: "0.1", want: "1,"},
+		{input: "0.1", want: ""},
+		{input: "1.1", want: "1,"},
 		{input: "-0.1 1", want: "-0.1,0.9,"},
 		{input: "0 0.1 1", want: "0.0,0.1,0.2,0.3,0.4,0.5,0.6,0.7,0.8,0.9,1.0,"},
 		// invalid inputs

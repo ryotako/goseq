@@ -90,10 +90,6 @@ loop:
 		}
 	}
 
-	if len(numArgs) < 3 && fst.GreaterThan(lst) {
-		inc, _ = decimal.NewFromString("-1")
-	}
-
 	if !isValidFormat(flags["-f"]) {
 		errorf(c.errStream, "invalid format string: `%s'", flags["-f"])
 		return INVALID_SYNTAX
@@ -111,19 +107,12 @@ loop:
 	if a := getAfterPoint(inc.String()); a > afterPoint {
 		afterPoint = a
 	}
-	if a := getAfterPoint(lst.String()); a > afterPoint {
-		afterPoint = a
-	}
+	// if a := getAfterPoint(lst.String()); a > afterPoint {
+	// 	afterPoint = a
+	// }
 
 	if fst.LessThan(lst) {
-		switch inc.Sign() {
-		case 0:
-			errorf(c.errStream, "zero increment")
-			return INCREMENT_ERROR
-		case -1:
-			errorf(c.errStream, "needs positive increment")
-			return INCREMENT_ERROR
-		default:
+		if inc.Sign() > 0 {
 			for i := fst; i.LessThanOrEqual(lst); i = i.Add(inc) {
 				if flagF {
 					f, _ := i.Float64()
@@ -139,14 +128,7 @@ loop:
 			}
 		}
 	} else if fst.GreaterThan(lst) {
-		switch inc.Sign() {
-		case 0:
-			errorf(c.errStream, "zero increment")
-			return INCREMENT_ERROR
-		case 1:
-			errorf(c.errStream, "needs negative increment")
-			return INCREMENT_ERROR
-		default:
+		if inc.Sign() < 0 {
 			for i := fst; i.GreaterThanOrEqual(lst); i = i.Add(inc) {
 				if flagF {
 					f, _ := i.Float64()
