@@ -29,6 +29,7 @@ func usage(w io.Writer) {
 }
 
 func (c *CLI) Run(args []string) int {
+	var flagF, flagW bool
 	flags := map[string]string{
 		"-f": "%g",
 		"-s": "\n",
@@ -38,7 +39,12 @@ func (c *CLI) Run(args []string) int {
 
 loop:
 	for i := 0; i < len(args); i++ {
-		if _, ok := flags[args[i]]; ok {
+		if args[i] == "-w" {
+			flagW = true
+		} else if _, ok := flags[args[i]]; ok {
+			if args[i] == "-f" {
+				flagF = true
+			}
 			if i+1 < len(args) {
 				flags[args[i]] = args[i+1]
 				i++
@@ -103,8 +109,12 @@ loop:
 			return INCREMENT_ERROR
 		default:
 			for i := fst; i.LessThanOrEqual(lst); i = i.Add(inc) {
-				f, _ := i.Float64()
-				fmt.Fprintf(c.outStream, "%s%s", fmt.Sprintf(flags["-f"], f), flags["-s"])
+				if !flagF && flagW {
+
+				} else {
+					f, _ := i.Float64()
+					fmt.Fprintf(c.outStream, "%s%s", fmt.Sprintf(flags["-f"], f), flags["-s"])
+				}
 			}
 		}
 	} else if fst.GreaterThan(lst) {
@@ -117,8 +127,12 @@ loop:
 			return INCREMENT_ERROR
 		default:
 			for i := fst; i.GreaterThanOrEqual(lst); i = i.Add(inc) {
-				f, _ := i.Float64()
-				fmt.Fprintf(c.outStream, "%s%s", fmt.Sprintf(flags["-f"], f), flags["-s"])
+				if !flagF && flagW {
+
+				} else {
+					f, _ := i.Float64()
+					fmt.Fprintf(c.outStream, "%s%s", fmt.Sprintf(flags["-f"], f), flags["-s"])
+				}
 			}
 		}
 	} else {
