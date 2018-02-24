@@ -99,6 +99,22 @@ loop:
 		return INVALID_SYNTAX
 	}
 
+	// values for option -w
+	beforePoint := getBeforePoint(fst.String())
+	if b := getBeforePoint(inc.String()); b > beforePoint {
+		beforePoint = b
+	}
+	if b := getBeforePoint(lst.String()); b > beforePoint {
+		beforePoint = b
+	}
+	afterPoint := getAfterPoint(fst.String())
+	if a := getAfterPoint(inc.String()); a > afterPoint {
+		afterPoint = a
+	}
+	if a := getAfterPoint(lst.String()); a > afterPoint {
+		afterPoint = a
+	}
+
 	if fst.LessThan(lst) {
 		switch inc.Sign() {
 		case 0:
@@ -109,11 +125,16 @@ loop:
 			return INCREMENT_ERROR
 		default:
 			for i := fst; i.LessThanOrEqual(lst); i = i.Add(inc) {
-				if !flagF && flagW {
-
-				} else {
+				if flagF {
 					f, _ := i.Float64()
 					fmt.Fprintf(c.outStream, "%s%s", fmt.Sprintf(flags["-f"], f), flags["-s"])
+				} else if flagW {
+					s := padZeroAfterPoint(i.String(), afterPoint)
+					s = padZeroBeforePoint(s, beforePoint)
+					fmt.Fprintf(c.outStream, "%s%s", s, flags["-s"])
+				} else {
+					s := padZeroAfterPoint(i.String(), afterPoint)
+					fmt.Fprintf(c.outStream, "%s%s", s, flags["-s"])
 				}
 			}
 		}
@@ -127,11 +148,16 @@ loop:
 			return INCREMENT_ERROR
 		default:
 			for i := fst; i.GreaterThanOrEqual(lst); i = i.Add(inc) {
-				if !flagF && flagW {
-
-				} else {
+				if flagF {
 					f, _ := i.Float64()
 					fmt.Fprintf(c.outStream, "%s%s", fmt.Sprintf(flags["-f"], f), flags["-s"])
+				} else if flagW {
+					s := padZeroAfterPoint(i.String(), afterPoint)
+					s = padZeroBeforePoint(s, beforePoint)
+					fmt.Fprintf(c.outStream, "%s%s", s, flags["-s"])
+				} else {
+					s := padZeroAfterPoint(i.String(), afterPoint)
+					fmt.Fprintf(c.outStream, "%s%s", s, flags["-s"])
 				}
 			}
 		}
@@ -166,4 +192,46 @@ func isValidFormat(s string) bool {
 		}
 	}
 	return true
+}
+
+func isExponentialNotation(d decimal.Decimal) bool {
+	f, _ := d.Float64()
+	return strings.Contains(fmt.Sprintf("%g", f), "e")
+}
+
+func getBeforePoint(s string) int {
+	if strings.Contains(s, ".") {
+		return strings.Index(s, ".")
+	} else {
+		return len(s)
+	}
+}
+
+func getAfterPoint(s string) int {
+	if strings.Contains(s, ".") {
+		return len(s) - strings.Index(s, ".") - 1
+	} else {
+		return 0
+	}
+}
+
+func padZeroBeforePoint(s string, n int) string {
+	m := n - getBeforePoint(s)
+	if m > 0 {
+		return strings.Repeat("0", m) + s
+	} else {
+		return s
+	}
+}
+
+func padZeroAfterPoint(s string, n int) string {
+	m := n - getAfterPoint(s)
+	if m > 0 {
+		if !strings.Contains(s, ".") {
+			s += "."
+		}
+		return s + strings.Repeat("0", m)
+	} else {
+		return s
+	}
 }

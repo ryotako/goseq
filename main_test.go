@@ -28,7 +28,7 @@ func TestRun(t *testing.T) {
 		// floating point numbers
 		{input: "0.1", want: "1,"},
 		{input: "-0.1 1", want: "-0.1,0.9,"},
-		{input: "0 0.1 1", want: "0,0.1,0.2,0.3,0.4,0.5,0.6,0.7,0.8,0.9,1,"},
+		{input: "0 0.1 1", want: "0.0,0.1,0.2,0.3,0.4,0.5,0.6,0.7,0.8,0.9,1.0,"},
 		// invalid inputs
 		{input: "", err: true},
 		{input: "a", err: true},
