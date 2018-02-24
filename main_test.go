@@ -42,6 +42,9 @@ func TestRun(t *testing.T) {
 		// -f option
 		{input: "-f %.1f 3", want: "1.0,2.0,3.0,"},
 		{input: "-f %+0.2f -1 1", want: "-1.00,+0.00,+1.00,"},
+		// -w option
+		{input: "-w 1 2 9", want: "1,3,5,7,9,"},
+		{input: "-w 1 2 10", want: "01,03,05,07,09,"},
 	}
 
 	for _, test := range tests {
