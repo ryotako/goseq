@@ -115,14 +115,19 @@ loop:
 			for i := fst; i.LessThanOrEqual(lst); i = i.Add(inc) {
 				if flagF {
 					f, _ := i.Float64()
-					fmt.Fprintf(c.outStream, "%s%s", fmt.Sprintf(flags["-f"], f), flags["-s"])
+					fmt.Fprint(c.outStream, fmt.Sprintf(flags["-f"], f))
 				} else if flagW {
 					s := padZeroAfterPoint(i.String(), afterPoint)
 					s = padZeroBeforePoint(s, beforePoint)
-					fmt.Fprintf(c.outStream, "%s%s", s, flags["-s"])
+					fmt.Fprint(c.outStream, s)
 				} else {
 					s := padZeroAfterPoint(i.String(), afterPoint)
-					fmt.Fprintf(c.outStream, "%s%s", s, flags["-s"])
+					fmt.Fprint(c.outStream, s)
+				}
+				if i.Equal(lst) {
+					fmt.Fprint(c.outStream, "\n")
+				} else {
+					fmt.Fprint(c.outStream, flags["-s"])
 				}
 			}
 		}
@@ -131,14 +136,19 @@ loop:
 			for i := fst; i.GreaterThanOrEqual(lst); i = i.Add(inc) {
 				if flagF {
 					f, _ := i.Float64()
-					fmt.Fprintf(c.outStream, "%s%s", fmt.Sprintf(flags["-f"], f), flags["-s"])
+					fmt.Fprint(c.outStream, fmt.Sprintf(flags["-f"], f))
 				} else if flagW {
 					s := padZeroAfterPoint(i.String(), afterPoint)
 					s = padZeroBeforePoint(s, beforePoint)
-					fmt.Fprintf(c.outStream, "%s%s", s, flags["-s"])
+					fmt.Fprint(c.outStream, s)
 				} else {
 					s := padZeroAfterPoint(i.String(), afterPoint)
-					fmt.Fprintf(c.outStream, "%s%s", s, flags["-s"])
+					fmt.Fprint(c.outStream, s)
+				}
+				if i.Equal(lst) {
+					fmt.Fprint(c.outStream, "\n")
+				} else {
+					fmt.Fprint(c.outStream, flags["-s"])
 				}
 			}
 		}

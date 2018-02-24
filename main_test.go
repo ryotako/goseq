@@ -37,8 +37,8 @@ func TestRun(t *testing.T) {
 		{input: "-", err: true},
 		{input: "+", err: true},
 		// -s option
-		{input: "-s @ 3", want: "1@2@3@"},
-		{input: "-s <> 3", want: "1<>2<>3<>"},
+		{input: "-s @ 3", want: "1@2@3,"},
+		{input: "-s <> 3", want: "1<>2<>3,"},
 		// -f option
 		{input: "-f %.1f 3", want: "1.0,2.0,3.0,"},
 		{input: "-f %+0.2f -1 1", want: "-1.00,+0.00,+1.00,"},
