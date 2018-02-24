@@ -33,7 +33,6 @@ func (c *CLI) Run(args []string) int {
 	flags := map[string]string{
 		"-f": "%g",
 		"-s": "\n",
-		"-t": "",
 	}
 	numArgs := []string{}
 
@@ -147,7 +146,6 @@ loop:
 		f, _ := fst.Float64()
 		fmt.Fprintf(c.outStream, "%s%s", fmt.Sprintf(flags["-f"], f), flags["-s"])
 	}
-	fmt.Fprint(c.outStream, flags["-t"])
 	return SUCCESS
 }
 
