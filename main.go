@@ -109,10 +109,14 @@ loop:
 	// if a := getAfterPoint(lst.String()); a > afterPoint {
 	// 	afterPoint = a
 	// }
-
+	var done bool
 	if fst.LessThan(lst) {
 		if inc.Sign() > 0 {
 			for i := fst; i.LessThanOrEqual(lst); i = i.Add(inc) {
+				done = true
+				if !i.Equal(fst) {
+					fmt.Fprint(c.outStream, flags["-s"])
+				}
 				if flagF {
 					f, _ := i.Float64()
 					fmt.Fprint(c.outStream, fmt.Sprintf(flags["-f"], f))
@@ -123,17 +127,16 @@ loop:
 				} else {
 					s := padZeroAfterPoint(i.String(), afterPoint)
 					fmt.Fprint(c.outStream, s)
-				}
-				if i.Equal(lst) {
-					fmt.Fprint(c.outStream, "\n")
-				} else {
-					fmt.Fprint(c.outStream, flags["-s"])
 				}
 			}
 		}
 	} else if fst.GreaterThan(lst) {
 		if inc.Sign() < 0 {
 			for i := fst; i.GreaterThanOrEqual(lst); i = i.Add(inc) {
+				done = true
+				if !i.Equal(fst) {
+					fmt.Fprint(c.outStream, flags["-s"])
+				}
 				if flagF {
 					f, _ := i.Float64()
 					fmt.Fprint(c.outStream, fmt.Sprintf(flags["-f"], f))
@@ -145,16 +148,15 @@ loop:
 					s := padZeroAfterPoint(i.String(), afterPoint)
 					fmt.Fprint(c.outStream, s)
 				}
-				if i.Equal(lst) {
-					fmt.Fprint(c.outStream, "\n")
-				} else {
-					fmt.Fprint(c.outStream, flags["-s"])
-				}
 			}
 		}
 	} else {
-		f, _ := fst.Float64()
-		fmt.Fprintf(c.outStream, "%s%s", fmt.Sprintf(flags["-f"], f), flags["-s"])
+		done = true
+		fmt.Fprint(c.outStream, fst)
+	}
+
+	if done {
+		fmt.Fprintln(c.outStream)
 	}
 	return SUCCESS
 }
